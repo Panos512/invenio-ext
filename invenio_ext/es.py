@@ -27,6 +27,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.connection import RequestsHttpConnection
 
 from invenio.base.globals import cfg
+
 from invenio_search.registry import mappings
 
 es = None
@@ -42,7 +43,8 @@ def create_index(sender, **kwargs):
         if mapping_filename in mappings:
             mapping = json.load(open(mappings[mapping_filename], "r"))
         es.indices.delete(index=index, ignore=404)
-        es.indices.create(index=index, body=mapping)
+        es.indices.create(index=index+".v1", body=mapping)
+        es.indices.put_alias(index=index+".v1", name=index)
 
 
 def delete_index(sender, **kwargs):
